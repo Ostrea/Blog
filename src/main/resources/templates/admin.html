@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+</head>
+<body>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    This content is only shown to administrators.
+</div>
+<div sec:authorize="hasRole('ROLE_USER')">
+    This content is only shown to users.
+</div>
+<div>
+    This content is shown for all.
+</div>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+</body>
+</html>
