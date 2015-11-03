@@ -1,9 +1,6 @@
 package my.ostrea.blog.configurations;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import my.ostrea.blog.models.MyUser;
@@ -16,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +26,12 @@ public class MyUserDetailsService implements UserDetailsService {
     @Transactional(readOnly=true)
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        MyUser user = userRepository.findByUsername(username);
-        List<GrantedAuthority> authorities = buildUserAuthority(user.getUserRoles());
+        Optional<MyUser> userFromDatabase = userRepository.findByUsername(username);
 
-        return buildUserForAuthentication(user, authorities);
-
+        return userFromDatabase.map(user -> {
+            List<GrantedAuthority> authorities = buildUserAuthority(user.getUserRoles());
+            return buildUserForAuthentication(user, authorities);
+        }).orElseThrow(() -> new UsernameNotFoundException("User " + username + " was not found in the database"));
     }
 
     /**
