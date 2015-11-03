@@ -23,6 +23,9 @@ public class MyUser {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "myUser")
     private Set<UserRole> userRoles = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
+    private Set<Article> articles = new HashSet<>();
+
     protected MyUser() {
     }
 
@@ -39,6 +42,13 @@ public class MyUser {
         this.userRoles = userRoles;
     }
 
+    public MyUser(String username, String password, boolean enabled, Set<UserRole> userRoles, Set<Article> articles) {
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.userRoles = userRoles;
+        this.articles = articles;
+    }
 
     public String getUsername() {
         return this.username;
@@ -78,5 +88,13 @@ public class MyUser {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(Set<Article> articles) {
+        this.articles = articles;
     }
 }
