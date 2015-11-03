@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org" >
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8" />
-    <title></title>
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <title>Blog</title>
 </head>
 <body>
-<a href="login">Login</a>
-<div>Username :</div> <div th:text="${username}"></div>
-<div>Password:</div> <div th:text="${password}"></div>
+
+<div class="topRightCorner" sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+    <a href="login">Login</a>
+</div>
+
+<div class="topRightCorner" sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+    <div>
+        <span>Hello, </span><span sec:authentication="name"></span>
+    </div>
+    <a href="login?logout">Logout</a>
+</div>
+
 </body>
 </html>

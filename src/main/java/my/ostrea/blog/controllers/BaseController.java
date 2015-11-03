@@ -15,8 +15,6 @@ public class BaseController {
      */
     @RequestMapping
     public String index(Model model) {
-        model.addAttribute("password", "");
-        model.addAttribute("username", "");
         return "index";
     }
 
