@@ -10,14 +10,16 @@
 <body>
 
 <div class="topRightCorner" sec:authorize="!isAuthenticated()">
-    <a href="login">Login</a>
+    <a href="/login">Login</a>
 </div>
 
 <div class="topRightCorner" sec:authorize="isAuthenticated()">
     <div>
         <span>Hello, </span><span sec:authentication="name"></span>
     </div>
-    <a href="login?logout">Logout</a>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout" />
+    </form>
 </div>
 
 <div sec:authorize="isAuthenticated()">

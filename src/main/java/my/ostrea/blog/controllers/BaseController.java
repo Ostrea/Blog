@@ -3,6 +3,7 @@ package my.ostrea.blog.controllers;
 import my.ostrea.blog.models.MyUser;
 import my.ostrea.blog.models.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +32,6 @@ public class BaseController {
         userFromDb.map(user -> model.addAttribute("articles", user.getArticles()));
 
         return "index";
-    }
-
-    @RequestMapping(value = "login", method = RequestMethod.GET)
-    public String login() {
-        return "login";
     }
 
     @RequestMapping(value = "admin", method = RequestMethod.GET)
