@@ -9,16 +9,25 @@
 </head>
 <body>
 
-<div class="topRightCorner" sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+<div class="topRightCorner" sec:authorize="!isAuthenticated()">
     <a href="login">Login</a>
 </div>
 
-<div class="topRightCorner" sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+<div class="topRightCorner" sec:authorize="isAuthenticated()">
     <div>
         <span>Hello, </span><span sec:authentication="name"></span>
     </div>
     <a href="login?logout">Logout</a>
 </div>
 
+<div sec:authorize="isAuthenticated()">
+    <table>
+        <tr th:each="article : ${articles}">
+            <td th:text="${article.title}"></td>
+            <td th:text="${article.content}"></td>
+            <td><a href="#" th:text="${article.author.username}"></a></td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>
