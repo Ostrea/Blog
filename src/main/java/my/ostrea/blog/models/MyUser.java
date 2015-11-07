@@ -20,7 +20,7 @@ public class MyUser {
     @Column(nullable = false)
     private boolean enabled;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "myUser")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "myUser")
     private Set<UserRole> userRoles = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")

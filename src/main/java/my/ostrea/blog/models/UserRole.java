@@ -49,4 +49,9 @@ public class UserRole {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return role;
+    }
 }
