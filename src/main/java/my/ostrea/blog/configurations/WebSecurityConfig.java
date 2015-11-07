@@ -1,6 +1,7 @@
 package my.ostrea.blog.configurations;
 
 import my.ostrea.blog.models.UserRepository;
+import my.ostrea.blog.models.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebMvcSecurity
@@ -57,6 +59,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username).map(user -> {
+
+            // Need to use StringUtils from Spring cause AbstractCollection::toString returns
+            // string with brackets and authorities couldn't be created from such representation
             String commaDelimitedRoles =
                     StringUtils.collectionToCommaDelimitedString(user.getUserRoles());
             List<GrantedAuthority> grantedAuthorities =
