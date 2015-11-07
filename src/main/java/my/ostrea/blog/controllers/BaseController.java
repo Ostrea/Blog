@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -25,16 +26,32 @@ public class BaseController {
      */
     @RequestMapping
     public String index(Model model) {
-        Optional<MyUser> userFromDb = userRepository
-                .findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        userFromDb.map(user -> model.addAttribute("articles", user.getArticles()));
+        getUserFromDbAndAddHisInfoToThePage(model,
+                SecurityContextHolder.getContext().getAuthentication().getName());
 
         return "index";
     }
 
-    @RequestMapping("admin")
-    public String admin() {
-        return "admin";
+    private void getUserFromDbAndAddHisInfoToThePage(Model model, String username) {
+        Optional<MyUser> userFromDb = userRepository
+                .findByUsername(username);
+        userFromDb.map(user -> model.addAttribute("articles", user.getArticles()));
     }
 
+    @RequestMapping("/administrator_control_panel")
+    public String administratorControlPanel() {
+        return "administrator_control_panel";
+    }
+
+    @RequestMapping("/{username}")
+    public String showUsersArticles(Model model, @PathVariable String username) {
+        String currentlyLoggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (currentlyLoggedUser.equals(username)) {
+            return "redirect:/";
+        }
+
+        getUserFromDbAndAddHisInfoToThePage(model, username);
+
+        return "index";
+    }
 }
