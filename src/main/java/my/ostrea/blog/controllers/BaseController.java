@@ -1,5 +1,7 @@
 package my.ostrea.blog.controllers;
 
+import my.ostrea.blog.models.Article;
+import my.ostrea.blog.models.ArticleRepository;
 import my.ostrea.blog.models.MyUser;
 import my.ostrea.blog.models.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
 
@@ -18,6 +21,9 @@ public class BaseController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ArticleRepository articleRepository;
 
     /**
      * Handles '/'
@@ -53,5 +59,15 @@ public class BaseController {
         getUserFromDbAndAddHisInfoToThePage(model, username);
 
         return "index";
+    }
+
+    @RequestMapping("/delete_article")
+    public String deleteArticle(@RequestParam("article_id") Long articleId) {
+        Article article = articleRepository.findOne(articleId);
+        if (article.getAuthor().getUsername()
+                .equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+            articleRepository.delete(article);
+        }
+        return "redirect:" + article.getAuthor().getUsername();
     }
 }

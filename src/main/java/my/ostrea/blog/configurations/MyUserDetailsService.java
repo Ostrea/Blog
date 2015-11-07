@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO rewrite to use AuthorityUtils (see rest guide at spring.io)
 @Service("userDetailsService")
 public class MyUserDetailsService implements UserDetailsService {
 
