@@ -23,13 +23,12 @@
 </div>
 
 <div sec:authorize="isAuthenticated()">
-    <table>
-        <tr th:each="article : ${articles}">
-            <td th:text="${article.title}"></td>
-            <td th:text="${article.content}"></td>
-            <td><a href="#" th:text="${article.author.username}"></a></td>
-        </tr>
-    </table>
+    <div th:each="article : ${articles}" class="article">
+        <div th:text="${article.title}" class="article-title"></div>
+        <div th:text="${article.content}" class="article-content"></div>
+        <div><a th:href="${article.author.username}" th:text="${article.author.username}"
+                class="article-author"></a></div>
+    </div>
 </div>
 </body>
 </html>

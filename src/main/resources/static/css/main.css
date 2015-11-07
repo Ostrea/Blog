@@ -2,3 +2,25 @@
     float: right;
     text-align: right;
 }
+
+.article {
+    border: inset crimson;
+    width: 90%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.article-title {
+    text-align: center;
+    font-size: larger;
+    font-weight: bold;
+}
+
+.article-content {
+    padding-left: 50px;
+}
+
+.article-author {
+    position: relative;
+    left: 95%;
+}
