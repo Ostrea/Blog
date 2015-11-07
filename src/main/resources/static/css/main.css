@@ -20,12 +20,7 @@
     padding-left: 50px;
 }
 
-.article-delete-button {
+.article-bottom-right-corner {
     position: relative;
-    left: 90%;
-}
-
-.article-author {
-    position: relative;
-    left: 95%;
+    left: 85%;
 }

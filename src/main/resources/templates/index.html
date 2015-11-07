@@ -26,12 +26,15 @@
     <div th:each="article : ${articles}" class="article">
         <div th:text="${article.title}" class="article-title"></div>
         <div th:text="${article.content}" class="article-content"></div>
-        <span class="article-delete-button">
-            <a th:href="@{/delete_article(article_id=${article.id})}">Delete</a>
-        </span>
-        <span class="article-author">
-            <a th:href="${article.author.username}" th:text="${article.author.username}"></a>
-        </span>
+        <div class="article-bottom-right-corner">
+            <span>
+                <a th:href="@{/delete_article(article_id=${article.id})}">Delete</a>
+            </span>
+            <span>
+                <span>Author: </span>
+                <a th:href="${article.author.username}" th:text="${article.author.username}"></a>
+            </span>
+        </div>
     </div>
 </div>
 </body>
