@@ -18,12 +18,14 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/")
 public class BaseController {
+    private final UserRepository userRepository;
+    private final ArticleRepository articleRepository;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ArticleRepository articleRepository;
+    public BaseController(UserRepository userRepository, ArticleRepository articleRepository) {
+        this.userRepository = userRepository;
+        this.articleRepository = articleRepository;
+    }
 
     /**
      * Handles '/'
