@@ -1,7 +1,6 @@
 package my.ostrea.blog.configurations;
 
 import my.ostrea.blog.models.UserRepository;
-import my.ostrea.blog.models.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,6 @@ import org.springframework.util.StringUtils;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebMvcSecurity
