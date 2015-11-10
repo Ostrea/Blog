@@ -40,6 +40,13 @@ public class BlogApplicationTests {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+    }
+
     @Test
     public void accessingStartPageAsAnonymousShouldReturnViewNamedIndexAndModelWithZeroAttributes()
             throws Exception {
@@ -59,10 +66,40 @@ public class BlogApplicationTests {
                 .andExpect(model().attributeExists("articles"));
     }
 
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
+    @Test
+    public void accessingUsernamePageAsAnonymousShouldRedirectToLoginPage()
+            throws Exception {
+        mockMvc.perform(get("/test"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @Test
+    @WithMockUser("userForTests")
+    public void accessingUsernamePageAsLoggedUserIfUsernameIsNotLoggedUsernameShouldShowIndexViewWithModelWithOneAttr()
+            throws Exception {
+        mockMvc.perform(get("/admin"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attributeExists("articles"));
+    }
+
+    @Test
+    @WithMockUser("userForTests")
+    public void accessingNotExistingUsernamePageAsLoggedUserShouldShowIndexViewWithModelWithZeroAttr()
+            throws Exception {
+        mockMvc.perform(get("/not_existing_user"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attributeDoesNotExist("articles"));
+    }
+
+    @Test
+    @WithUserDetails("test")
+    public void accessingYourOwnUsernamePageAsLoggedUserShouldRedirectToIndex()
+            throws Exception {
+        mockMvc.perform(get("/test"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 }
