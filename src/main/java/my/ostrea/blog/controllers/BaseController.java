@@ -1,5 +1,7 @@
 package my.ostrea.blog.controllers;
 
+import my.ostrea.blog.exceptions.ArticleNotFoundException;
+import my.ostrea.blog.exceptions.CantDeleteNotYoursArticlesException;
 import my.ostrea.blog.models.Article;
 import my.ostrea.blog.models.ArticleRepository;
 import my.ostrea.blog.models.MyUser;
@@ -64,11 +66,16 @@ public class BaseController {
 
     @RequestMapping("/delete_article")
     public String deleteArticle(@RequestParam("article_id") Long articleId) {
-        Article article = articleRepository.findOne(articleId);
-        if (article.getAuthor().getUsername()
-                .equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
-            articleRepository.delete(article);
-        }
-        return "redirect:" + article.getAuthor().getUsername();
+        Optional<Article> articleFromDb = Optional.ofNullable(articleRepository.findOne(articleId));
+        articleFromDb.map(article -> {
+            if (article.getAuthor().getUsername()
+                    .equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+                articleRepository.delete(article);
+            } else {
+                throw new CantDeleteNotYoursArticlesException();
+            }
+            return Optional.of(article);
+        }).orElseThrow(ArticleNotFoundException::new);
+        return "redirect:" + articleFromDb.map(Article::getAuthor).map(MyUser::getUsername);
     }
 }
