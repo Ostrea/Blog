@@ -1,8 +1,14 @@
 package my.ostrea.blog;
 
+import my.ostrea.blog.controllers.BaseController;
+import my.ostrea.blog.models.ArticleRepository;
+import my.ostrea.blog.models.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -13,9 +19,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Iterator;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BlogApplication.class)
@@ -28,7 +38,9 @@ public class BlogApplicationTests {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+        MockitoAnnotations.initMocks(this);
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
     }
@@ -90,4 +102,17 @@ public class BlogApplicationTests {
     }
 
     // TODO form login tests, delete article tests
+    @Test
+    @WithMockUser("userForTests")
+    public void deletingNotExistingArticleShouldReturnNotFound() throws Exception {
+        mockMvc.perform(get("/delete_article?article_id=-1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser("userForTests")
+    public void deletingOtherPersonArticleShouldReturnForbidden() throws Exception {
+        mockMvc.perform(get("/delete_article?article_id=2"))
+                .andExpect(status().isForbidden());
+    }
 }
