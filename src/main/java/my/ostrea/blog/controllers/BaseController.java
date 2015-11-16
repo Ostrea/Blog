@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -35,6 +33,7 @@ public class BaseController {
      */
     @RequestMapping
     public String index(Model model) {
+        // TODO do not go to database if user is not logged
         getUserFromDbAndAddHisInfoToThePage(model,
                 SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -77,5 +76,20 @@ public class BaseController {
             return Optional.of(article);
         }).orElseThrow(ArticleNotFoundException::new);
         return "redirect:" + articleFromDb.map(Article::getAuthor).map(MyUser::getUsername);
+    }
+
+    @RequestMapping(value = "/create_article", method = RequestMethod.GET)
+    public String createArticle(Model model) {
+        model.addAttribute("article", new Article());
+        return "create_article";
+    }
+
+    @RequestMapping(value = "/create_article", method = RequestMethod.POST)
+    public String createArticle(@ModelAttribute Article article) {
+        MyUser author = userRepository.findByUsername(
+                SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        article.setAuthor(author);
+        articleRepository.save(article);
+        return "redirect:/";
     }
 }

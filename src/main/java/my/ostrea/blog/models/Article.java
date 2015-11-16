@@ -25,7 +25,7 @@ public class Article {
         this.author = author;
     }
 
-    protected Article() {}
+    public Article() {}
 
     public Long getId() {
         return id;

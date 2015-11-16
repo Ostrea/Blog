@@ -17,6 +17,9 @@
     <div>
         <span>Hello, </span><span sec:authentication="name"></span>
     </div>
+    <div>
+        <a href="/create_article">Create article</a>
+    </div>
     <form th:action="@{/logout}" method="post">
         <input type="submit" value="Logout" />
     </form>
