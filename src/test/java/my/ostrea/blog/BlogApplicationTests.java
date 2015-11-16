@@ -116,6 +116,8 @@ public class BlogApplicationTests {
                 .andExpect(status().isForbidden());
     }
 
+// TODO deleting existing article test
+
     @Test
     public void accessingCreateArticlePageAsAnonymousShouldRedirectToLoginPage()
             throws Exception {

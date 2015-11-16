@@ -76,7 +76,13 @@ public class BaseController {
             }
             return Optional.of(article);
         }).orElseThrow(ArticleNotFoundException::new);
-        return "redirect:" + articleFromDb.map(Article::getAuthor).map(MyUser::getUsername);
+
+        Optional<String> username = articleFromDb.map(Article::getAuthor).map(MyUser::getUsername);
+        if (username.isPresent()) {
+            return "redirect:" + username.get();
+        } else {
+            throw new RuntimeException("Something went completely wrong!");
+        }
     }
 
     @RequestMapping(value = "/create_article", method = RequestMethod.GET)
