@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -101,7 +102,6 @@ public class BlogApplicationTests {
                 .andExpect(redirectedUrl("/"));
     }
 
-    // TODO form login tests, delete article tests
     @Test
     @WithMockUser("userForTests")
     public void deletingNotExistingArticleShouldReturnNotFound() throws Exception {
@@ -114,5 +114,13 @@ public class BlogApplicationTests {
     public void deletingOtherPersonArticleShouldReturnForbidden() throws Exception {
         mockMvc.perform(get("/delete_article?article_id=2"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void accessingCreateArticlePageAsAnonymousShouldRedirectToLoginPage()
+            throws Exception {
+        mockMvc.perform(get("/create_article"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
     }
 }
