@@ -32,6 +32,8 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = BlogApplication.class)
 @WebAppConfiguration
 public class BlogApplicationTests {
+    private static final String USERNAME_FOR_TESTS = "test";
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -68,7 +70,7 @@ public class BlogApplicationTests {
     @Test
     public void accessingUsernamePageAsAnonymousShouldRedirectToLoginPage()
             throws Exception {
-        mockMvc.perform(get("/test"))
+        mockMvc.perform(get("/" + USERNAME_FOR_TESTS))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
@@ -77,7 +79,7 @@ public class BlogApplicationTests {
     @WithMockUser("userForTests")
     public void accessingUsernamePageAsLoggedUserIfUsernameIsNotLoggedUsernameShouldShowIndexViewWithModelWithOneAttr()
             throws Exception {
-        mockMvc.perform(get("/admin"))
+        mockMvc.perform(get("/" + USERNAME_FOR_TESTS))
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"))
                 .andExpect(model().attributeExists("articles"));
@@ -94,10 +96,10 @@ public class BlogApplicationTests {
     }
 
     @Test
-    @WithUserDetails("test")
+    @WithUserDetails(USERNAME_FOR_TESTS)
     public void accessingYourOwnUsernamePageAsLoggedUserShouldRedirectToIndex()
             throws Exception {
-        mockMvc.perform(get("/test"))
+        mockMvc.perform(get("/" + USERNAME_FOR_TESTS))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
