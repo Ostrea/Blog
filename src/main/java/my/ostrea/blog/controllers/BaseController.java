@@ -33,9 +33,10 @@ public class BaseController {
      */
     @RequestMapping
     public String index(Model model) {
-        // TODO do not go to database if user is not logged
-        getUserFromDbAndAddHisInfoToThePage(model,
-                SecurityContextHolder.getContext().getAuthentication().getName());
+        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser")) {
+            getUserFromDbAndAddHisInfoToThePage(model,
+                    SecurityContextHolder.getContext().getAuthentication().getName());
+        }
 
         return "index";
     }
