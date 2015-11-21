@@ -2,10 +2,7 @@ package my.ostrea.blog.controllers;
 
 import my.ostrea.blog.exceptions.ArticleNotFoundException;
 import my.ostrea.blog.exceptions.CantDeleteNotYoursArticlesException;
-import my.ostrea.blog.models.Article;
-import my.ostrea.blog.models.ArticleRepository;
-import my.ostrea.blog.models.MyUser;
-import my.ostrea.blog.models.UserRepository;
+import my.ostrea.blog.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -88,13 +85,12 @@ public class BaseController {
 
     @RequestMapping(value = "/create_article", method = RequestMethod.GET)
     public String createArticle(Model model) {
-        model.addAttribute("article", new Article());
+        model.addAttribute("articleDto", new ArticleDto());
         return "create_article";
     }
 
-    // TODO add dto
     @RequestMapping(value = "/create_article", method = RequestMethod.POST)
-    public String  createArticle(Model model, @ModelAttribute Article article) {
+    public String  createArticle(Model model, @ModelAttribute ArticleDto article) {
         boolean errors = false;
         if (article.getTitle().length() > 255) {
             errors = true;
@@ -110,8 +106,8 @@ public class BaseController {
 
         MyUser author = userRepository.findByUsername(
                 SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        article.setAuthor(author);
-        articleRepository.save(article);
+        Article articleForDb = new Article(article.getTitle(), article.getContent(), author);
+        articleRepository.save(articleForDb);
         return "redirect:/";
     }
 }

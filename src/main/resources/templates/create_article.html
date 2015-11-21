@@ -14,7 +14,7 @@
 <div th:if="${contentError}">
     Content should be less or equal 255 characters.
 </div>
-<form action="#" th:action="@{/create_article}" th:object="${article}" method="post">
+<form action="#" th:action="@{/create_article}" th:object="${articleDto}" method="post">
     <label>
         Article title
         <input type="text" th:field="*{title}" />
