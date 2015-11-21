@@ -1,8 +1,10 @@
 package my.ostrea.blog;
 
 import my.ostrea.blog.controllers.BaseController;
+import my.ostrea.blog.models.Article;
 import my.ostrea.blog.models.ArticleRepository;
 import my.ostrea.blog.models.UserRepository;
+import my.ostrea.blog.utils.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -23,10 +28,12 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Iterator;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BlogApplication.class)
@@ -111,6 +118,7 @@ public class BlogApplicationTests {
                 .andExpect(status().isNotFound());
     }
 
+    // TODO first write article to db and then check and then delete it
     @Test
     @WithMockUser("userForTests")
     public void deletingOtherPersonArticleShouldReturnForbidden() throws Exception {
@@ -126,5 +134,48 @@ public class BlogApplicationTests {
         mockMvc.perform(get("/create_article"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @Test
+    @WithUserDetails(USERNAME_FOR_TESTS)
+    public void createArticleWithTitleGreaterThan255ShouldReturnViewWithTitleError() throws Exception {
+        mockMvc.perform(post("/create_article")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", TestUtil.createStringWithLength(256))
+                .param("content", "")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_article"))
+                .andExpect(model().attributeExists("titleError"))
+                .andExpect(model().attributeDoesNotExist("contentError"));
+    }
+
+    @Test
+    @WithUserDetails(USERNAME_FOR_TESTS)
+    public void createArticleWithContentGreaterThan255ShouldReturnViewWithContentError() throws Exception {
+        mockMvc.perform(post("/create_article")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", "")
+                .param("content", TestUtil.createStringWithLength(256))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_article"))
+                .andExpect(model().attributeExists("contentError"))
+                .andExpect(model().attributeDoesNotExist("titleError"));
+    }
+
+    @Test
+    @WithUserDetails(USERNAME_FOR_TESTS)
+    public void createArticleWithContentAndTitleGreaterThan255ShouldReturnViewWithContentAndTitleErrors()
+            throws Exception {
+        mockMvc.perform(post("/create_article")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("title", TestUtil.createStringWithLength(256))
+                .param("content", TestUtil.createStringWithLength(256))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_article"))
+                .andExpect(model().attributeExists("titleError"))
+                .andExpect(model().attributeExists("contentError"));
     }
 }

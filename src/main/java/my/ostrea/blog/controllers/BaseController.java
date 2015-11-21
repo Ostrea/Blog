@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Optional;
 
@@ -91,8 +92,22 @@ public class BaseController {
         return "create_article";
     }
 
+    // TODO add dto
     @RequestMapping(value = "/create_article", method = RequestMethod.POST)
-    public String createArticle(@ModelAttribute Article article) {
+    public String  createArticle(Model model, @ModelAttribute Article article) {
+        boolean errors = false;
+        if (article.getTitle().length() > 255) {
+            errors = true;
+            model.addAttribute("titleError", true);
+        }
+        if (article.getContent().length() > 255) {
+            errors = true;
+            model.addAttribute("contentError", true);
+        }
+        if (errors) {
+            return "create_article";
+        }
+
         MyUser author = userRepository.findByUsername(
                 SecurityContextHolder.getContext().getAuthentication().getName()).get();
         article.setAuthor(author);
