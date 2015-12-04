@@ -138,7 +138,19 @@ public class BlogApplicationTests {
         articleRepository.delete(savedArticle);
     }
 
-// TODO deleting existing article test
+    @Test
+    @WithUserDetails(USERNAME_FOR_TESTS)
+    public void deletingExistingArticleShouldRedirectToUsersPage() throws Exception {
+        MyUser author = userRepository.findByUsername(USERNAME_FOR_TESTS).get();
+        Article article = new Article("test", "test", author);
+        Article savedArticle = articleRepository.save(article);
+
+        mockMvc.perform(get("/delete_article?article_id=" + savedArticle.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(USERNAME_FOR_TESTS));
+
+        articleRepository.delete(savedArticle);
+    }
 
     @Test
     public void accessingCreateArticlePageAsAnonymousShouldRedirectToLoginPage()
