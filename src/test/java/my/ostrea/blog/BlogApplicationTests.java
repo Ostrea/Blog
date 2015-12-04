@@ -3,6 +3,7 @@ package my.ostrea.blog;
 import my.ostrea.blog.controllers.BaseController;
 import my.ostrea.blog.models.Article;
 import my.ostrea.blog.models.ArticleRepository;
+import my.ostrea.blog.models.MyUser;
 import my.ostrea.blog.models.UserRepository;
 import my.ostrea.blog.utils.TestUtil;
 import org.junit.Before;
@@ -45,6 +46,12 @@ public class BlogApplicationTests {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ArticleRepository articleRepository;
 
     @Before
     public void setUp() {
@@ -118,12 +125,17 @@ public class BlogApplicationTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO first write article to db and then check and then delete it
     @Test
     @WithMockUser("userForTests")
     public void deletingOtherPersonArticleShouldReturnForbidden() throws Exception {
-        mockMvc.perform(get("/delete_article?article_id=2"))
+        MyUser author = userRepository.findByUsername(USERNAME_FOR_TESTS).get();
+        Article article = new Article("test", "test", author);
+        Article savedArticle = articleRepository.save(article);
+
+        mockMvc.perform(get("/delete_article?article_id=" + savedArticle.getId()))
                 .andExpect(status().isForbidden());
+
+        articleRepository.delete(savedArticle);
     }
 
 // TODO deleting existing article test
