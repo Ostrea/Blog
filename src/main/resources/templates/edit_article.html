@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>Blog-Edit article</title>
+</head>
+<body>
+<div th:if="${titleError}">
+    Title should be less or equal 255 characters.
+</div>
+<div th:if="${contentError}">
+    Content should be less or equal 255 characters.
+</div>
+<form action="#" th:action="@{/edit_article}" th:object="${articleDto}" method="post">
+    <label>
+        Article title
+        <input type="text" th:field="*{title}" />
+    </label>
+    <label>
+        Content
+        <input type="text" th:field="*{content}" />
+    </label>
+    <input type="submit" value="Submit" />
+</form>
+</body>
+</html>

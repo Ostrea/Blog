@@ -31,6 +31,7 @@
         <div th:text="${article.content}" class="article-content"></div>
         <div class="article-bottom-right-corner">
             <span>
+                <a th:href="@{/edit_article(article_id=${article.id})}">Edit</a>
                 <a th:href="@{/delete_article(article_id=${article.id})}">Delete</a>
             </span>
             <span>

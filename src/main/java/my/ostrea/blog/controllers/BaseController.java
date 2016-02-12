@@ -2,6 +2,7 @@ package my.ostrea.blog.controllers;
 
 import my.ostrea.blog.exceptions.ArticleNotFoundException;
 import my.ostrea.blog.exceptions.CantDeleteNotYoursArticlesException;
+import my.ostrea.blog.exceptions.CantEditNotYoursArticlesException;
 import my.ostrea.blog.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,9 @@ import java.util.Optional;
 public class BaseController {
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+
+    private Long editedArticleId;
+    private String  editedArticleAuthor;
 
     @Autowired
     public BaseController(UserRepository userRepository, ArticleRepository articleRepository) {
@@ -83,6 +87,7 @@ public class BaseController {
         }
     }
 
+    // TODO fix:anonymous user can create articles
     @RequestMapping(value = "/create_article", method = RequestMethod.GET)
     public String createArticle(Model model) {
         model.addAttribute("articleDto", new ArticleDto());
@@ -108,6 +113,52 @@ public class BaseController {
                 SecurityContextHolder.getContext().getAuthentication().getName()).get();
         Article articleForDb = new Article(article.getTitle(), article.getContent(), author);
         articleRepository.save(articleForDb);
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/edit_article", method = RequestMethod.GET)
+    public String editArticle(Model model, @RequestParam("article_id") Long articleId) {
+        Optional<Article> articleFromDb = Optional.ofNullable(articleRepository.findOne(articleId));
+        articleFromDb.map(article -> {
+            if (!article.getAuthor().getUsername()
+                    .equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+                throw new CantEditNotYoursArticlesException();
+            }
+            model.addAttribute("articleDto", new ArticleDto(article.getTitle(), article.getContent()));
+            editedArticleAuthor = article.getAuthor().getUsername();
+            editedArticleId = articleId;
+
+            return Optional.of(article);
+        }).orElseThrow(ArticleNotFoundException::new);
+        return "edit_article";
+    }
+
+    @RequestMapping(value = "/edit_article", method = RequestMethod.POST)
+    public String editArticle(Model model, @ModelAttribute ArticleDto article) {
+        if (editedArticleId == null || editedArticleAuthor == null || !editedArticleAuthor.equals(
+                SecurityContextHolder.getContext().getAuthentication().getName())) {
+            throw new CantEditNotYoursArticlesException();
+        }
+
+        boolean errors = false;
+        if (article.getTitle().length() > 5) {
+            errors = true;
+            model.addAttribute("titleError", true);
+        }
+        if (article.getContent().length() > 5) {
+            errors = true;
+            model.addAttribute("contentError", true);
+        }
+        if (errors) {
+            return "edit_article?article_id=" + editedArticleId;
+        }
+
+        MyUser author = userRepository.findByUsername(
+                SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Article articleForDb = new Article(article.getTitle(), article.getContent(), author);
+        articleForDb.setId(editedArticleId);
+        articleRepository.save(articleForDb);
+        editedArticleId = null;
         return "redirect:/";
     }
 }
