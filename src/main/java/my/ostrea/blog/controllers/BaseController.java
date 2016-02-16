@@ -86,7 +86,6 @@ public class BaseController {
         }
     }
 
-    // TODO fix:anonymous user can create articles
     @RequestMapping(value = "/create_article", method = RequestMethod.GET)
     public String createArticle(Model model) {
         model.addAttribute("articleDto", new ArticleDto());
@@ -158,6 +157,7 @@ public class BaseController {
         articleForDb.setId(editedArticleId);
         articleRepository.save(articleForDb);
         editedArticleId = null;
+        editedArticleAuthor = null;
         return "redirect:/";
     }
 }
